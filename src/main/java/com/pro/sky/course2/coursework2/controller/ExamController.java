@@ -11,7 +11,7 @@ import java.util.Collection;
 
 @RestController
 @RequestMapping("/exam")
-public class ExamController {
+public class  ExamController {
     private final ExaminerService service;
 
     public ExamController(ExaminerService service) {

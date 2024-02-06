@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/exam/java")
-public class JavaController {
+@RequestMapping("/exam/math")
+public class MathController {
     private final QuestionService service;
 
-    public JavaController(@Qualifier("javaQuestionService") QuestionService service) {
+    public MathController(@Qualifier("mathQuestionService") QuestionService service) {
         this.service = service;
     }
     @GetMapping("/add")
@@ -34,4 +34,4 @@ public class JavaController {
         Question questionToRemove = new Question(question, answer);
         return service.remove(questionToRemove);
     }
-}
+  }

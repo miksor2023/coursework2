@@ -4,84 +4,65 @@ import com.pro.sky.course2.coursework2.domain.Question;
 import com.pro.sky.course2.coursework2.exception.QuestinAlreadyAddedException;
 import com.pro.sky.course2.coursework2.exception.QuestionNotFoundException;
 import com.pro.sky.course2.coursework2.exception.SetOfQuestionsIsEmptyException;
+import com.pro.sky.course2.coursework2.repository.JavaQuestionRepository;
 import com.pro.sky.course2.coursework2.service.JavaQuestionService;
 import com.pro.sky.course2.coursework2.service.QuestionService;
 //import org.junit.jupiter.api.Assertions;
+import static com.pro.sky.course2.coursework2.TestConstants.TEST_JAVA_QUESTION_SET;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
+@ExtendWith(MockitoExtension.class)
 public class JavaQuestionServiceTest {
-    JavaQuestionService out = new JavaQuestionService();
-
-    @BeforeEach
-    public void createQuestionSet() {
-        Collection<Question> questions = new ArrayList<>(out.getAll());
-        for (Question question : questions) {
-            out.remove(question);
-        }
-        for (int i = 0; i < 5; i++) {
-            Question question = new Question("Вопрос " + i, "Ответ " + i);
-            out.add(question);
-        }
-    }
+    @Mock
+    private JavaQuestionRepository javaQuestionRepositorymock;
+    @InjectMocks
+    private JavaQuestionService out;
 
     @Test
     public void mustAddQuestion() {
-        Question expected = new Question("Вопрос 6", "Ответ 6");
-        Question actual = out.add(new Question("Вопрос 6", "Ответ 6"));
+        Question expected = new Question("(Java) Вопрос 6", "(Java) Ответ 6");
+        when(javaQuestionRepositorymock.add(expected)).thenReturn(expected);
+        Question actual = out.add(new Question("(Java) Вопрос 6", "(Java) Ответ 6"));
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     public void mustRemoveQuestion() {
-        Question expected = new Question("Вопрос 1", "Ответ 1");
-        Question actual = out.remove(new Question("Вопрос 1", "Ответ 1"));
+        Question expected = new Question("(Java) Вопрос 1", "(Java) Ответ 1");
+        when(javaQuestionRepositorymock.remove(expected)).thenReturn(expected);
+        Question actual = out.remove(new Question("(Java) Вопрос 1", "(Java) Ответ 1"));
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     public void mustGetAll() {
-        Collection<Question> expectedQuestions = new HashSet<>();
-        for (int i = 0; i < 5; i++) {
-            Question question = new Question("Вопрос " + i, "Ответ " + i);
-            expectedQuestions.add(question);
-        }
-        Collection<Question> actualQuestions = out.getAll();
-        assertThat(actualQuestions).hasSameElementsAs(expectedQuestions);
+        when(javaQuestionRepositorymock.getAll()).thenReturn(TEST_JAVA_QUESTION_SET);
+        Collection<Question> expectedQuestions = TEST_JAVA_QUESTION_SET;
+        assertThat(out.getAll()).hasSameElementsAs(expectedQuestions);
     }
 
     @Test
     public void mustGetRandomQuestion() {
-        Collection<Question> actualQuestions = out.getAll();
-        assertThat(actualQuestions).contains(out.getRandomQuestion());
-    }
-
-    @Test
-    public void mustThrowQuestioAlredyAddedException() {
-        assertThatExceptionOfType(QuestinAlreadyAddedException.class)
-                .isThrownBy(() -> out.add(new Question("Вопрос 1", "Ответ 1")));
-    }
-
-    @Test
-    public void mustThrowQuestionNotFoundException() {
-        assertThatExceptionOfType(QuestionNotFoundException.class)
-                .isThrownBy(() -> out.remove(new Question("Вопрос 6", "Ответ 6")));
+        when(javaQuestionRepositorymock.getAll()).thenReturn(TEST_JAVA_QUESTION_SET);
+        assertThat(TEST_JAVA_QUESTION_SET).contains(out.getRandomQuestion());
     }
 
     @Test
     public void mustThrowSetOfQuestionsIsEmptyException() {
-        Collection<Question> questions = new ArrayList<>(out.getAll());
-        for (Question question : questions) {
-            out.remove(question);
-        }
+        when(javaQuestionRepositorymock.getAll()).thenReturn(new HashSet<>());
         assertThatExceptionOfType(SetOfQuestionsIsEmptyException.class)
                 .isThrownBy(() -> out.getRandomQuestion());
     }
